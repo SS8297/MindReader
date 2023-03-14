@@ -23,8 +23,8 @@ function buildAutoencoder(inputLayer::I; nnParams) where I <: Integer
   args = nnParams()
   Random.seed(31415);
   return Chain(
-    Dense(inputLayer, args.λ, args.σ),
-    Dense(args.λ, inputLayer, args.σ),
+    Dense(inputLayer, args.λ, args.σ; init = Flux.kaiming_normal),
+    Dense(args.λ, inputLayer, args.σ; init = Flux.kaiming_normal),
   )
 end
 
