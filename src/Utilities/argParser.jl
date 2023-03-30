@@ -68,6 +68,12 @@ function shArgParser(args)
         default = 4
         help = "bin overlap along raw signal"
 
+        "--montage", "-m"
+        nargs = '?'
+        arg_type = String
+        default = "None"
+        help = "electrode remontage configuration"
+
     end
 
     parsed_args = parse_args(∫)
