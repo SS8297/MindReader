@@ -21,15 +21,15 @@ Build a three-layered autoencoder.
 
 See also: [`modelTrain!`](@ref)
 """
-function buildAutoencoder(inputLayer::I; nnParams) where I <: Integer
+function buildAutoencoder(inputLayer::F; nnParams) where F <: Float
   @info("Building three-layered autoencoder...")
   args = nnParams()
   num_lay = args.l + 1
   model = Array{Dense}(undef, num_lay)
 
   pl = inputLayer
-  for (i,n) in zip(1:num_lay, push!(args.λ, inputLayer))
-    nl = n
+  for (i,n) in zip(1:num_lay, push!(args.λ, 1))
+    nl = Int(inputLayer * n)
     seed!(31415);
     model[i] = Dense(pl, nl, args.σ; init = kaiming_normal)
     pl = nl
