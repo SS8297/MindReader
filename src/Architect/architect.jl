@@ -26,7 +26,7 @@ function buildAutoencoder(inputLayer::I; nnParams) where I <: Integer
   args = nnParams()
   num_lay = args.l + 1
   model = Array{Dense}(undef, num_lay)
-  
+
   pl = inputLayer
   for (i,n) in zip(1:num_lay, push!(args.λ, inputLayer))
     nl = n
@@ -35,7 +35,7 @@ function buildAutoencoder(inputLayer::I; nnParams) where I <: Integer
     pl = nl
   end
 
-  return Chain(model)
+  return Chain(model...)
 end
 
 ####################################################################################################
