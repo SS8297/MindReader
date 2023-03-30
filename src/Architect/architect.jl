@@ -21,7 +21,7 @@ Build a three-layered autoencoder.
 
 See also: [`modelTrain!`](@ref)
 """
-function buildAutoencoder(inputLayer::F; nnParams) where F <: Float
+function buildAutoencoder(inputLayer::I; nnParams) where I <: Integer
   @info("Building three-layered autoencoder...")
   args = nnParams()
   num_lay = args.l + 1
