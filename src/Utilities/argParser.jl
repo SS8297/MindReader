@@ -58,8 +58,8 @@ function shArgParser(args)
 
         "--window-size", "-w"
         nargs = '?'
-        arg_type = Int
-        default = 256
+        arg_type = float
+        default = 1
         help = "window size along raw signal"
 
         "--bin-overlap", "-b"
