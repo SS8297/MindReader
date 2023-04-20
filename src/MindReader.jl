@@ -16,6 +16,8 @@ using OrderedCollections
 using StatsBase
 using CSV
 using FFTW
+using Wavelets
+using ContinuousWavelets
 using HiddenMarkovModelReaders
 
 # Flux
