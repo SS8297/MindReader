@@ -74,6 +74,12 @@ function shArgParser(args)
         default = "None"
         help = "electrode remontage configuration"
 
+        "--spectra", "-s"
+        nargs = '?'
+        arg_type = String
+        default = "STFT"
+        help = "EEG spectrum representation"
+
     end
 
     parsed_args = parse_args(∫)
