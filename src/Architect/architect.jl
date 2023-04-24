@@ -75,7 +75,7 @@ function buildAutoencoder(inputLayer::I; nnParams) where I <: Integer
     seed!(31415);
     encode[i] = Conv((kw[i], kh[i]), ci[i] => co[i], args.σ; init = kaiming_normal, stride = ks[i], pad = zp[i])
     seed!(31415);
-    decode[j] = ConvTranspose((kw[j], kh[j]), ci[j] => co[j], args.σ; init = kaiming_normal, stride = ks[j], pad = zp[j])
+    decode[j] = ConvTranspose((kw[j], kh[j]), co[j] => ci[j], args.σ; init = kaiming_normal, stride = ks[j], pad = zp[j])
   end
   return Chain(encode..., decode...)
 end
