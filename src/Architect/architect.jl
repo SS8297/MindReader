@@ -43,9 +43,7 @@ end
 # convolutional autoencoder
 """
 
-    buildAutoencoder(inputLayer::I;
-    nnParams)
-    where I <: Integer
+    buildAutoencoder(nnParams)
 
 # Description
 Build a three-layered autoencoder.
@@ -58,7 +56,7 @@ Build a three-layered autoencoder.
 
 See also: [`modelTrain!`](@ref)
 """
-function buildAutoencoder(inputLayer::I; nnParams) where I <: Integer
+function buildAutoencoder(nnParams)
   # @info("Building three-layered autoencoder...")
   args = nnParams()
   kw = args.KW
@@ -67,7 +65,6 @@ function buildAutoencoder(inputLayer::I; nnParams) where I <: Integer
   co = args.CO
   ks = args.KS
   zp = args.ZP
-  num_lay = args.l + 1
   encode = Array{Conv}(undef, length(kw))
   decode = Array{Conv}(undef, length(kw))
   for i in eachindex(kw)
