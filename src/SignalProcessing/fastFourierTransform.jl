@@ -34,7 +34,7 @@ Apply fast fourier transform (FFT) to channel.
 
 See also: [`extractSignalBin`](@ref)
 """
-function extractFFT(channel::A; binSize::N, binOverlap::N; abs::Bool = true) where A <: Array where N <: Number
+function extractFFT(channel::A; binSize::N, binOverlap::N, abs::Bool = true) where A <: Array where N <: Number
   # define variables
   stepSize = floor(Int32, binSize / binOverlap)
   signalSteps = 1:stepSize:length(channel)
