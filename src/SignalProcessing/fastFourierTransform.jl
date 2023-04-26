@@ -11,7 +11,7 @@ Use `extractFFT` on EDF file per channel from shell arguments. Returns a diction
 
 See also: [`extractSignalBin`](@ref)
 """
-function extractFFT(edfDf::DataFrame, params::D; abs::bool = true) where D <: Dict
+function extractFFT(edfDf::DataFrame, params::D; abs::Bool = true) where D <: Dict
   if haskey(params, "window-size") && haskey(params, "bin-overlap")
     return extractFFT(edfDf, binSize = params["window-size"], binOverlap = params["bin-overlap"]; abs = abs)
   else
@@ -34,7 +34,7 @@ Apply fast fourier transform (FFT) to channel.
 
 See also: [`extractSignalBin`](@ref)
 """
-function extractFFT(channel::A; binSize::N, binOverlap::N; abs::bool = true) where A <: Array where N <: Number
+function extractFFT(channel::A; binSize::N, binOverlap::N; abs::Bool = true) where A <: Array where N <: Number
   # define variables
   stepSize = floor(Int32, binSize / binOverlap)
   signalSteps = 1:stepSize:length(channel)
@@ -89,7 +89,7 @@ Use `extractFFT` on EDF file per channel. Returns a dictionary with channel name
 
 See also: [`extractSignalBin`](@ref)
 """
-function extractFFT(edfDf::DataFrame; binSize::N, binOverlap::N, abs::bool = true) where N <: Number
+function extractFFT(edfDf::DataFrame; binSize::N, binOverlap::N, abs::Bool = true) where N <: Number
   @info "Extracting channel frecuencies..."
   channelDc = Dict()
   freqAr = begin
@@ -329,7 +329,7 @@ function extractCWT(edfDf::DataFrame; binSize::N, binOverlap::N) where N <: Numb
       length(signalSteps)
     )
   end
-
+ 
   # iterate on dataframe channels
   for (ψ, ε) ∈ enumerate(names(edfDf))
     freqAr = extractCWT(edfDf[:, ψ], binSize = binSize, binOverlap = binOverlap)
