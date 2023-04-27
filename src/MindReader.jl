@@ -44,6 +44,8 @@ export extractSignalBin
 
 # fastFourierTransform
 export extractFFT
+export extractDWT
+export extractCWT
 
 # architect
 export buildAutoencoder
