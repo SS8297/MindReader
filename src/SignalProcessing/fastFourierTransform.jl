@@ -11,9 +11,9 @@ Use `extractFFT` on EDF file per channel from shell arguments. Returns a diction
 
 See also: [`extractSignalBin`](@ref)
 """
-function extractFFT(edfDf::DataFrame, params::D; abs::Bool = true) where D <: Dict
+function extractFFT(edfDf::DataFrame, params::D; window::Bool = false; onlyAbs::Bool = true) where D <: Dict
   if haskey(params, "window-size") && haskey(params, "bin-overlap")
-    return extractFFT(edfDf, binSize = params["window-size"], binOverlap = params["bin-overlap"]; abs = abs)
+    return extractFFT(edfDf, binSize = params["window-size"], binOverlap = params["bin-overlap"]; window = window, onlyAbs = onlyAbs)
   else
     @error "Variables are not defined in dictionary"
   end
@@ -34,13 +34,13 @@ Apply fast fourier transform (FFT) to channel.
 
 See also: [`extractSignalBin`](@ref)
 """
-function extractFFT(channel::A; binSize::N, binOverlap::N, abs::Bool = true) where A <: Array where N <: Number
+function extractFFT(channel::A; binSize::N, binOverlap::N, window::Bool = false, onlyAbs::Bool = true) where A <: Array where N <: Number
   # define variables
   stepSize = floor(Int32, binSize / binOverlap)
   signalSteps = 1:stepSize:length(channel)
   freqAr = Array{Float64}(
     undef,
-    abs ? 1 : 2,
+    onlyAbs ? 1 : 2,
     length(signalSteps),
     binSize
   )
@@ -65,11 +65,20 @@ function extractFFT(channel::A; binSize::N, binOverlap::N, abs::Bool = true) whe
       ]
     end
 
+    function hanning(window<:Array)
+      points = collect(range(-0.5, 0.5, length(window)))
+      hann = map(x -> cos(pi*x)^2, points)
+      return window .* hann
+    end
+
+    if(window) channelExtract = hanning(channelExtract) end
+
+
     # calculate fourier transform
     fftChannel = fft(channelExtract)
     magniFft = abs.(fftChannel)
     freqAr[1, ι, :] = magniFft[1:binSize]
-    if (!abs) phaseFft = angle.(fftChannel); freqAr[2, ι, :] = phaseFft[1:binSize] end
+    if (!onlyAbs) phaseFft = angle.(fftChannel); freqAr[2, ι, :] = phaseFft[1:binSize] end
 
   end
   return freqAr
@@ -89,15 +98,15 @@ Use `extractFFT` on EDF file per channel. Returns a dictionary with channel name
 
 See also: [`extractSignalBin`](@ref)
 """
-function extractFFT(edfDf::DataFrame; binSize::N, binOverlap::N, abs::Bool = true) where N <: Number
-  @info "Extracting channel frecuencies..."
+function extractFFT(edfDf::DataFrame; binSize::N, binOverlap::N, window::Bool = false, onlyAbs::Bool = true) where N <: Number
+  @info "Extracting channel frequencies..."
   channelDc = Dict()
   freqAr = begin
     stepSize = floor(Int32, binSize / binOverlap)
     signalSteps = 1:stepSize:size(edfDf, 1)
     Array{Float64}(
       undef,
-      abs ? 1 : 2,
+      onlyAbs ? 1 : 2,
       binSize,
       length(signalSteps)
     )
@@ -105,7 +114,7 @@ function extractFFT(edfDf::DataFrame; binSize::N, binOverlap::N, abs::Bool = tru
 
   # iterate on dataframe channels
   for (ψ, ε) ∈ enumerate(names(edfDf))
-    α = extractFFT(edfDf[:, ψ], binSize = binSize, binOverlap = binOverlap, abs = abs)
+    α = extractFFT(edfDf[:, ψ], binSize = binSize, binOverlap = binOverlap, window = window, onlyAbs = onlyAbs)
     for β ∈ axes(α, 2)
       freqAr[:, :, β] = α[:, β, :]
     end
@@ -167,7 +176,7 @@ function extractDWT(channel::A; binSize::N, binOverlap::N) where A <: Array wher
     # extract channel
     if signalBoundry <= length(channel)
       channelExtract = [
-        channel[signalSteps[ι]:signalBoundry]
+        channel[signalSteps[ι]:signalBoundry];
       ]
 
     # adjust last bin
@@ -179,9 +188,10 @@ function extractDWT(channel::A; binSize::N, binOverlap::N) where A <: Array wher
     end
 
     # calculate fourier transform
+    # dwtChannel = map(x -> dwt(x, wavelet(WT.haar)), channelExtract)
     dwtChannel = dwt(channelExtract, wavelet(WT.haar))
     # Incase of complex wavelet, currently redundant
-    false ? realDwt = abs.(dwtChannel) : dwtChannel
+    false ? realDwt = abs.(dwtChannel) : realDwt = dwtChannel
     freqAr[ι, :] = realDwt
 
   end
@@ -268,8 +278,8 @@ function extractCWT(channel::A; binSize::N, binOverlap::N) where A <: Array wher
   signalSteps = 1:stepSize:length(channel)
   freqAr = Array{Float64}(
     undef,
-    binSize,
-    binSize,
+    binSize÷4,
+    binSize÷4,
     length(signalSteps)
   )
 
@@ -280,7 +290,7 @@ function extractCWT(channel::A; binSize::N, binOverlap::N) where A <: Array wher
     # extract channel
     if signalBoundry <= length(channel)
       channelExtract = [
-        channel[signalSteps[ι]:signalBoundry]
+        channel[signalSteps[ι]:signalBoundry];
       ]
 
     # adjust last bin
@@ -293,9 +303,11 @@ function extractCWT(channel::A; binSize::N, binOverlap::N) where A <: Array wher
 
     # calculate fourier transfo
     # ContinuousWavelets.cwt(f, wavelet(cHaar, Q =85, β = 1))
-    cwtChannel = cwt(channelExtract, wavelet(cHaar, Q =85, β = 1))
+    # cwtChannel = map( x -> ContinuousWavelets.cwt(x, wavelet(cHaar, Q = 85, β = 1)), channelExtract)
+    #cwtChannel = ContinuousWavelets.cwt(channelExtract, wavelet(cHaar, Q = 85, β = 1))
+    cwtChannel = ContinuousWavelets.cwt(channelExtract, wavelet(cHaar, Q = 66, β=4))[1:4:end,2:end]'
     # Incase of complex wavelet, currently redundant
-    false ? realCwt = abs.(cwtChannel) : cwtChannel
+    false ? realCwt = abs.(cwtChannel) : realCwt = cwtChannel
     freqAr[:, :, ι] = realCwt
 
   end
@@ -317,15 +329,15 @@ Use `extractCWT` on EDF file per channel. Returns a dictionary with channel name
 See also: [`extractSignalBin`](@ref)
 """
 function extractCWT(edfDf::DataFrame; binSize::N, binOverlap::N) where N <: Number
-  @info "Extracting channel frecuencies..."
+  @info "Extracting channel frequencies..."
   channelDc = Dict()
   freqAr = begin
     stepSize = floor(Int32, binSize / binOverlap)
     signalSteps = 1:stepSize:size(edfDf, 1)
     Array{Float64}(
       undef,
-      binSize,
-      binSize,
+      binSize÷4,
+      binSize÷4,
       length(signalSteps)
     )
   end
@@ -335,7 +347,7 @@ function extractCWT(edfDf::DataFrame; binSize::N, binOverlap::N) where N <: Numb
     freqAr = extractCWT(edfDf[:, ψ], binSize = binSize, binOverlap = binOverlap)
     channelDc[ε] = copy(freqAr)
   end
-  return channelDc
+  return channelDc 
 end
 
 ####################################################################################################
