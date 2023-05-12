@@ -22,7 +22,7 @@ using HiddenMarkovModelReaders
 
 # Flux
 using Flux: Chain, Dense
-using Flux: mse, throttle, ADAM
+using Flux: mse, throttle, ADAM, mean
 using Flux: throttle, params, train!
 using Flux: @epochs
 using Flux.Data: DataLoader

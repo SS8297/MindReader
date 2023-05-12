@@ -33,7 +33,7 @@ function modelTrain!(model, ɒ; nnParams)
   trainAr = args.device.(ɒ)
 
   @info("Training model...")
-  loss(χ) = mse(model(χ), χ)
+  loss(χ) = args.loss(model(χ), χ)
 
   # training
   evalcb = throttle(() -> @show(loss(trainAr[1])), args.throttle)
@@ -44,3 +44,7 @@ function modelTrain!(model, ɒ; nnParams)
 end
 
 ####################################################################################################
+
+function mscs(ŷ, y; agg = mean)
+  agg(abs.(cumsum(ŷ) .- cumsum(y)) .^ 2)
+end
