@@ -11,9 +11,9 @@ Use `extractFFT` on EDF file per channel from shell arguments. Returns a diction
 
 See also: [`extractSignalBin`](@ref)
 """
-function extractFFT(edfDf::DataFrame, params::D; window::Bool = false; onlyAbs::Bool = true) where D <: Dict
+function extractFFT(edfDf::DataFrame, params::D; window::Bool = false, onlyAbs::Bool = true) where D <: Dict
   if haskey(params, "window-size") && haskey(params, "bin-overlap")
-    return extractFFT(edfDf, binSize = params["window-size"], binOverlap = params["bin-overlap"]; window = window, onlyAbs = onlyAbs)
+    return extractFFT(edfDf, binSize = params["window-size"], binOverlap = params["bin-overlap"], window = window, onlyAbs = onlyAbs)
   else
     @error "Variables are not defined in dictionary"
   end
@@ -65,7 +65,7 @@ function extractFFT(channel::A; binSize::N, binOverlap::N, window::Bool = false,
       ]
     end
 
-    function hanning(window<:Array)
+    function hanning(window::A) where A <: Array
       points = collect(range(-0.5, 0.5, length(window)))
       hann = map(x -> cos(pi*x)^2, points)
       return window .* hann
