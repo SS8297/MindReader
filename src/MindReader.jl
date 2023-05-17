@@ -16,8 +16,6 @@ using OrderedCollections
 using StatsBase
 using CSV
 using FFTW
-using Wavelets
-using ContinuousWavelets
 using HiddenMarkovModelReaders
 
 # Flux
@@ -55,6 +53,8 @@ export shifter, reshifter
 
 # autoencoder
 export modelTrain!
+export mscs
+export macs
 
 ####################################################################################################
 
