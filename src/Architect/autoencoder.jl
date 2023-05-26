@@ -48,3 +48,7 @@ end
 function mscs(ŷ, y; agg = mean)
   agg(abs.(cumsum(ŷ) .- cumsum(y)) .^ 2)
 end
+
+function macs(ŷ, y; agg = mean)
+  agg(abs.(cumsum(ŷ) .- cumsum(y)))
+end
