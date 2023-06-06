@@ -17,13 +17,14 @@ using StatsBase
 using CSV
 using FFTW
 using Wavelets
+using WaveletsExt
 using ContinuousWavelets
 using Random
 using HiddenMarkovModelReaders
 
 # Flux
 using Flux: Chain, Dense
-using Flux: mse, throttle, ADAM, mean
+using Flux: mse, throttle, ADAM, mean, mae
 using Flux: throttle, params, train!
 using Flux: @epochs
 using Flux.Data: DataLoader
