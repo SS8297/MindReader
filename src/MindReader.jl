@@ -56,7 +56,7 @@ export buildAutoencoder
 export shifter, reshifter
 
 # autoencoder
-export modelTrain!
+export modelTrain!, mscs, macs
 
 ####################################################################################################
 
